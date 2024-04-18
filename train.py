@@ -14,6 +14,9 @@ sys.path.append(os.path.join(dir_path, 'model'))
 from dataloader import create_dataloaders
 from MLP import MLP
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
 # Load data
 dir_path = os.path.dirname(os.path.abspath(__file__))
 dataset_dir = os.path.join(dir_path, 'dataset')
@@ -33,6 +36,7 @@ output_features = 4
 num_hidden_layers = 2
 
 model = MLP(input_features, num_hidden_layers, output_features)
+model.to(device)
 criterion = nn.MSELoss()  
 optimizer = optim.Adam(model.parameters(), lr=0.001) 
 
@@ -44,6 +48,8 @@ for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
     for inputs, targets in train_loader:
+        inputs = inputs.to(device)
+        targets = targets.to(device)
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, targets)
@@ -60,6 +66,8 @@ for epoch in range(num_epochs):
         with torch.no_grad():
             val_loss = 0.0
             for inputs, targets in val_loader:
+                inputs = inputs.to(device)
+                targets = targets.to(device)    
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 val_loss += loss.item()

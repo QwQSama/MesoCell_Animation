@@ -13,14 +13,19 @@ from MLP import MLP
 from dataloader import create_dataloaders
 
 
-def test_model(model, test_loader, criterion = nn.MSELoss()):
+def test_model(model, test_loader, criterion = nn.MSELoss(), device = "cpu"):
     total_loss = 0.0
     with torch.no_grad():
         for inputs, targets in test_loader:
+            inputs = inputs.to(device)
+            targets = targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
             total_loss += loss.item()
     return total_loss / len(test_loader)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 # file_path
 dir_path = os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +42,7 @@ _, _, test_loader = create_dataloaders(train_data, val_data, test_data, batch_si
 trained_model_dir = os.path.join(dir_path, 'trained_model')
 model_path = os.path.join(trained_model_dir, 'model_complete.pth')
 model = torch.load(model_path)
+model.to(device)
 model.eval()
 
 # test model
@@ -45,13 +51,15 @@ name_list = ['MSE', 'L1', 'Huber']
 for i in range(len(loss_list)):
     loss = loss_list[i]
     name = name_list[i]
-    test_loss = test_model(model, test_loader,criterion=loss)
+    test_loss = test_model(model=model, test_loader=test_loader, criterion=loss, device=device)
     print(f"Average Test Loss of {name}: {test_loss}")
 
 rmse_loss = 0.0
 criterion = nn.MSELoss()
 with torch.no_grad():
     for inputs, targets in test_loader:
+        inputs = inputs.to(device)
+        targets = targets.to(device)
         outputs = model(inputs)
         loss = torch.sqrt(criterion(outputs, targets))
         rmse_loss += loss.item()
