@@ -33,7 +33,6 @@ Key findings include:
 
 ## Future Work
 - **Extend to Complex Structures**: Explore using more complex granular structures for simulation and testing.
-- **Optimize Model Performance**: Investigate advanced architectures and hyperparameter tuning to enhance model accuracy.
 - **Automatic Calibration**: Set up automatic calibration procedures for the machine learning model to generalize across different granular material types.
 
 
